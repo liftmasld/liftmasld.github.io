@@ -15,19 +15,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
 
   <main class="container">
 
-    <header class="site-header">
-
+    <header>
       <h1>LIFT-MASLD</h1>
 
       <p class="subtitle">
         Longitudinal prediction of hepatic disease severity in MASLD
       </p>
-
     </header>
 
 
@@ -43,14 +40,11 @@
       <!-- Liver stiffness -->
       <div class="input-row">
 
-        <div class="field-label">
-          <label for="lsm">
-            Liver stiffness
-          </label>
+        <div class="label">
+          Liver stiffness
         </div>
 
-        <div class="input-control">
-
+        <div class="input-box">
           <input
             id="lsm"
             type="number"
@@ -59,11 +53,7 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-
-          <span class="unit">
-            kPa
-          </span>
-
+          <span class="unit">kPa</span>
         </div>
 
       </div>
@@ -72,14 +62,11 @@
       <!-- Total bilirubin -->
       <div class="input-row">
 
-        <div class="field-label">
-          <label for="bilirubin">
-            Total bilirubin
-          </label>
+        <div class="label">
+          Total bilirubin
         </div>
 
-        <div class="input-control">
-
+        <div class="input-box">
           <input
             id="bilirubin"
             type="number"
@@ -88,11 +75,7 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-
-          <span class="unit">
-            mg/dL
-          </span>
-
+          <span class="unit">mg/dL</span>
         </div>
 
       </div>
@@ -101,14 +84,11 @@
       <!-- Alkaline phosphatase -->
       <div class="input-row">
 
-        <div class="field-label">
-          <label for="alp">
-            Alkaline phosphatase
-          </label>
+        <div class="label">
+          Alkaline phosphatase
         </div>
 
-        <div class="input-control">
-
+        <div class="input-box">
           <input
             id="alp"
             type="number"
@@ -117,11 +97,7 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-
-          <span class="unit">
-            U/L
-          </span>
-
+          <span class="unit">U/L</span>
         </div>
 
       </div>
@@ -130,14 +106,11 @@
       <!-- Platelet count -->
       <div class="input-row">
 
-        <div class="field-label">
-          <label for="platelets">
-            Platelet count
-          </label>
+        <div class="label">
+          Platelet count
         </div>
 
-        <div class="input-control">
-
+        <div class="input-box">
           <input
             id="platelets"
             type="number"
@@ -146,11 +119,7 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-
-          <span class="unit">
-            10⁹/L
-          </span>
-
+          <span class="unit">10⁹/L</span>
         </div>
 
       </div>
@@ -159,14 +128,11 @@
       <!-- AST -->
       <div class="input-row">
 
-        <div class="field-label">
-          <label for="ast">
-            AST
-          </label>
+        <div class="label">
+          AST
         </div>
 
-        <div class="input-control">
-
+        <div class="input-box">
           <input
             id="ast"
             type="number"
@@ -175,11 +141,7 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-
-          <span class="unit">
-            U/L
-          </span>
-
+          <span class="unit">U/L</span>
         </div>
 
       </div>
@@ -188,14 +150,11 @@
       <!-- AST upper limit of normal -->
       <div class="input-row">
 
-        <div class="field-label">
-          <label for="ast-uln">
-            AST upper limit of normal
-          </label>
+        <div class="label">
+          AST upper limit of normal
         </div>
 
-        <div class="input-control">
-
+        <div class="input-box">
           <input
             id="ast-uln"
             type="number"
@@ -204,26 +163,16 @@
             inputmode="decimal"
             value="40"
           >
-
-          <span class="unit">
-            U/L
-          </span>
-
+          <span class="unit">U/L</span>
         </div>
 
       </div>
 
 
-      <div
-        id="form-error"
-        class="error-message hidden"
-      ></div>
+      <div id="form-error" class="error-message hidden"></div>
 
 
-      <button
-        id="calculate"
-        type="button"
-      >
+      <button id="calculate" type="button">
         Calculate LIFT-MASLD
       </button>
 
@@ -231,67 +180,29 @@
 
 
     <!-- Results -->
-    <section
-      id="result-card"
-      class="card result-card hidden"
-    >
+    <section id="result" class="card result hidden">
 
-      <p class="result-kicker">
+      <h2>
         Predicted hepatic disease severity
-      </p>
+      </h2>
 
-      <div class="result-number">
+      <div class="percentile">
         <span id="percentile-value">--</span>
-        <sup>th</sup>
+        <span class="percentile-label">percentile</span>
       </div>
 
-      <div class="result-label">
-        percentile
-      </div>
-
-
-      <div class="percentile-track">
-
-        <div
-          id="percentile-fill"
-          class="percentile-fill"
-        ></div>
-
-        <div
-          id="percentile-marker"
-          class="percentile-marker"
-        ></div>
-
-      </div>
-
-
-      <div class="percentile-axis">
-        <span>0</span>
-        <span>50</span>
-        <span>100</span>
-      </div>
-
-
-      <p
-        id="interpretation"
-        class="interpretation"
-      ></p>
+      <p id="interpretation"></p>
 
     </section>
 
 
     <!-- Privacy -->
-    <section class="privacy-box">
+    <section class="notice">
 
-      <strong>
-        Privacy
-      </strong>
-
-      <p>
-        All calculations are performed locally in your browser.
-        Values entered into this calculator are not transmitted,
-        stored, or retained.
-      </p>
+      <strong>Privacy:</strong>
+      All calculations are performed locally in your browser.
+      Values entered into this calculator are not transmitted,
+      stored, or retained.
 
     </section>
 
