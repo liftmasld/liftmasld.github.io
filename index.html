@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>LIFT-MASLD</title>
+  <meta
+    name="description"
+    content="LIFT-MASLD clinical prediction model for longitudinal hepatic disease severity in MASLD."
+  >
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -13,114 +17,212 @@
 
   <main class="container">
 
-    <header>
+    <header class="site-header">
       <h1>LIFT-MASLD</h1>
+
       <p class="subtitle">
         Longitudinal prediction of hepatic disease severity in MASLD
       </p>
     </header>
 
+
     <section class="card">
 
       <h2>Clinical inputs</h2>
 
+      <p class="intro">
+        Enter baseline clinical measurements. Leave a field blank if the value
+        is unavailable.
+      </p>
+
+
+      <!-- Liver stiffness -->
       <div class="input-row">
-        <div class="label">
-          Liver stiffness
-          <span class="subtext">FibroScan</span>
+
+        <div class="field-label">
+          <label for="lsm">Liver stiffness</label>
+          <span class="field-note">FibroScan liver stiffness measurement</span>
         </div>
 
-        <div class="input-box">
-          <input id="lsm" type="number" step="any">
+        <div class="input-control">
+          <input
+            id="lsm"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            placeholder="Enter value"
+          >
           <span class="unit">kPa</span>
         </div>
+
       </div>
 
+
+      <!-- Bilirubin -->
       <div class="input-row">
-        <div class="label">
-          Total bilirubin
+
+        <div class="field-label">
+          <label for="bilirubin">Total bilirubin</label>
         </div>
 
-        <div class="input-box">
-          <input id="bilirubin" type="number" step="any">
+        <div class="input-control">
+          <input
+            id="bilirubin"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            placeholder="Enter value"
+          >
           <span class="unit">mg/dL</span>
         </div>
+
       </div>
 
+
+      <!-- ALP -->
       <div class="input-row">
-        <div class="label">
-          Alkaline phosphatase
+
+        <div class="field-label">
+          <label for="alp">Alkaline phosphatase</label>
         </div>
 
-        <div class="input-box">
-          <input id="alp" type="number" step="any">
+        <div class="input-control">
+          <input
+            id="alp"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            placeholder="Enter value"
+          >
           <span class="unit">U/L</span>
         </div>
+
       </div>
 
+
+      <!-- Platelets -->
       <div class="input-row">
-        <div class="label">
-          Platelet count
+
+        <div class="field-label">
+          <label for="platelets">Platelet count</label>
         </div>
 
-        <div class="input-box">
-          <input id="platelets" type="number" step="any">
+        <div class="input-control">
+          <input
+            id="platelets"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            placeholder="Enter value"
+          >
           <span class="unit">10⁹/L</span>
         </div>
+
       </div>
 
+
+      <!-- AST -->
       <div class="input-row">
-        <div class="label">
-          APRI available?
-          <span class="subtext">
-            Used only to reproduce the model's missingness indicator
+
+        <div class="field-label">
+          <label for="ast">AST</label>
+          <span class="field-note">
+            Optional; used to determine APRI availability
           </span>
         </div>
 
-        <div class="toggle">
-          <label>
-            <input type="radio" name="apri" value="yes" checked>
-            Yes
-          </label>
-
-          <label>
-            <input type="radio" name="apri" value="no">
-            No
-          </label>
+        <div class="input-control">
+          <input
+            id="ast"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            placeholder="Optional"
+          >
+          <span class="unit">U/L</span>
         </div>
+
       </div>
 
-      <button id="calculate">
+
+      <!-- AST ULN -->
+      <div class="input-row">
+
+        <div class="field-label">
+          <label for="ast-uln">AST upper limit of normal</label>
+          <span class="field-note">
+            Default: 40 U/L; replace with your laboratory's ULN
+          </span>
+        </div>
+
+        <div class="input-control">
+          <input
+            id="ast-uln"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            value="40"
+          >
+          <span class="unit">U/L</span>
+        </div>
+
+      </div>
+
+
+      <div id="form-error" class="error-message hidden"></div>
+
+      <button id="calculate" type="button">
         Calculate LIFT-MASLD
       </button>
 
     </section>
 
-    <section id="result" class="card result hidden">
 
-      <h2>Predicted hepatic disease severity</h2>
+    <!-- Results -->
+    <section id="result-card" class="card result-card hidden">
 
-      <div class="percentile">
-        <span id="percentile">--</span>
-        <span class="percentile-label">percentile</span>
+      <p class="result-kicker">
+        Predicted hepatic disease severity
+      </p>
+
+      <div class="result-number">
+        <span id="percentile-value">--</span><sup>th</sup>
       </div>
 
-      <p id="interpretation"></p>
+      <div class="result-label">
+        percentile
+      </div>
+
+      <div class="percentile-track">
+        <div id="percentile-fill" class="percentile-fill"></div>
+        <div id="percentile-marker" class="percentile-marker"></div>
+      </div>
+
+      <div class="percentile-axis">
+        <span>0</span>
+        <span>50</span>
+        <span>100</span>
+      </div>
+
+      <p id="interpretation" class="interpretation"></p>
 
     </section>
 
-    <section class="notice">
-      <strong>Privacy:</strong>
-      All calculations are performed locally in your browser.
-      Values entered into this calculator are not transmitted or stored.
-    </section>
 
-    <footer>
+    <!-- Privacy -->
+    <section class="privacy-box">
+      <strong>Privacy</strong>
       <p>
-        LIFT-MASLD is intended for research and clinical decision support
-        and has not yet undergone external validation.
+        All calculations are performed locally in your browser. Values entered
+        into this calculator are not transmitted, stored, or retained.
       </p>
-    </footer>
+    </section>
 
   </main>
 
