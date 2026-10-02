@@ -1,75 +1,44 @@
-/*
-  LIFT-MASLD calculator
-
-  IMPORTANT:
-  The final model constants have NOT yet been inserted.
-
-  Next step:
-  Export the exact SCORE-BAR model constants from R and replace
-  MODEL below with the validated values.
-*/
+let MODEL = null;
 
 
-const MODEL = {
+/* ============================================================
+   Load validated LIFT-MASLD model
+   ============================================================ */
 
-  /*
-    These placeholders will eventually contain things such as:
-
-    medians: {
-      lsm: ...,
-      bilirubin: ...,
-      alp: ...,
-      platelets: ...
-    },
-
-    centering: {...},
-
-    scaling: {...},
-
-    betaVisit2: {...},
-
-    betaVisit3: {...},
-
-    calibrationVisit2: {
-      intercept: ...,
-      slope: ...
-    },
-
-    calibrationVisit3: {
-      intercept: ...,
-      slope: ...
-    },
-
-    percentileReference: [...]
-  */
-
-  ready: false
-};
+fetch("liftmasld_model.json")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Could not load model.");
+    }
+    return response.json();
+  })
+  .then(model => {
+    MODEL = model;
+  })
+  .catch(error => {
+    console.error(error);
+    showError("The LIFT-MASLD model could not be loaded.");
+  });
 
 
-/* ---------- Helpers ---------- */
+/* ============================================================
+   Helpers
+   ============================================================ */
 
+function getNumber(id) {
+  const x = document.getElementById(id).value.trim();
 
-function getOptionalNumber(id) {
-
-  const raw = document.getElementById(id).value.trim();
-
-  if (raw === "") {
+  if (x === "") {
     return null;
   }
 
-  const value = Number(raw);
+  const z = Number(x);
 
-  if (!Number.isFinite(value)) {
-    return null;
-  }
-
-  return value;
+  return Number.isFinite(z) ? z : null;
 }
 
 
 function showError(message) {
-
   const box = document.getElementById("form-error");
 
   box.textContent = message;
@@ -78,7 +47,6 @@ function showError(message) {
 
 
 function clearError() {
-
   const box = document.getElementById("form-error");
 
   box.textContent = "";
@@ -86,62 +54,98 @@ function clearError() {
 }
 
 
-function ordinalSuffix(n) {
+/* ============================================================
+   Build the six selected predictor columns
+   ============================================================ */
 
-  const mod100 = n % 100;
+function makePredictors() {
 
-  if (mod100 >= 11 && mod100 <= 13) {
-    return "th";
+  const lsm = getNumber("lsm");
+  const bilirubin = getNumber("bilirubin");
+  const alp = getNumber("alp");
+  const platelets = getNumber("platelets");
+  const ast = getNumber("ast");
+  const astULN = getNumber("ast-uln");
+
+
+  if (astULN !== null && astULN <= 0) {
+    throw new Error(
+      "AST upper limit of normal must be greater than zero."
+    );
   }
-
-  switch (n % 10) {
-    case 1: return "st";
-    case 2: return "nd";
-    case 3: return "rd";
-    default: return "th";
-  }
-}
-
-
-/* ---------- Read clinical inputs ---------- */
-
-
-function readInputs() {
-
-  const lsm = getOptionalNumber("lsm");
-  const bilirubin = getOptionalNumber("bilirubin");
-  const alp = getOptionalNumber("alp");
-  const platelets = getOptionalNumber("platelets");
-  const ast = getOptionalNumber("ast");
-  const astULN = getOptionalNumber("ast-uln");
 
 
   /*
-    Platelet missingness indicator.
-
-    If platelets are unavailable:
-      plateletMissing = 1
-
-    The validated model will then substitute the fixed
-    HALO training median for the numerical platelet value.
+    Names must exactly match the R model.
   */
 
-  const plateletMissing =
+  const LSM =
+    "log1p_liver_stiffness_from_fibroscan_k_pa_x";
+
+  const BILI =
+    "log1p_total_bilirubin_x";
+
+  const ALP =
+    "alkaline_phosphatase_x";
+
+  const PLT =
+    "platelets_x";
+
+  const PLT_MISS =
+    "platelets_missing_x";
+
+  const APRI_MISS =
+    "log1p_ast_to_platelet_ratio_index_apri_missing_x";
+
+
+  /*
+    Apply the same transformations as the R preprocessing.
+
+    IMPORTANT:
+    Median imputation happens on the transformed predictor scale.
+  */
+
+  const x = {};
+
+
+  x[LSM] =
+    lsm === null
+      ? MODEL.medians[LSM]
+      : Math.log1p(lsm);
+
+
+  x[BILI] =
+    bilirubin === null
+      ? MODEL.medians[BILI]
+      : Math.log1p(bilirubin);
+
+
+  x[ALP] =
+    alp === null
+      ? MODEL.medians[ALP]
+      : alp;
+
+
+  x[PLT] =
+    platelets === null
+      ? MODEL.medians[PLT]
+      : platelets;
+
+
+  /*
+    Missingness indicators
+  */
+
+  x[PLT_MISS] =
     platelets === null ? 1 : 0;
 
 
   /*
-    APRI availability.
+    APRI is available only when AST, its ULN,
+    and platelets are all available.
 
-    APRI = [(AST / AST_ULN) / platelets] * 100
-
-    The final fitted model does NOT use the APRI magnitude,
-    but it does contain an APRI-missing indicator.
-
-    APRI is therefore considered available only when:
-      AST is available
-      AST ULN is available
-      platelet count is available
+    The actual APRI magnitude does not enter the final model;
+    only its missingness indicator survived BAR selection.
   */
 
   const apriAvailable =
@@ -151,189 +155,311 @@ function readInputs() {
     platelets !== null &&
     platelets > 0;
 
-  const apriMissing =
+
+  x[APRI_MISS] =
     apriAvailable ? 0 : 1;
 
 
-  /*
-    We calculate APRI anyway for auditing/debugging,
-    even though its numerical value currently has
-    coefficient zero in the final model.
-  */
-
-  const apri = apriAvailable
-    ? ((ast / astULN) / platelets) * 100
-    : null;
-
-
-  return {
-    lsm,
-    bilirubin,
-    alp,
-    platelets,
-    ast,
-    astULN,
-
-    plateletMissing,
-    apriMissing,
-    apri
-  };
+  return x;
 }
 
 
-/* ---------- Display result ---------- */
+/* ============================================================
+   Predict severity for a particular visit
+   ============================================================ */
+
+function predictVisit(x, visitIndex) {
+
+  const names =
+    MODEL.selected_predictors;
+
+  const means =
+    MODEL.x_means[visitIndex];
+
+  const beta =
+    MODEL.beta[visitIndex];
 
 
-function displayPercentile(percentile) {
+  /*
+    Reproduce R:
+        X centered by visit-specific training mean
+        then divided by training scale
+  */
 
-  percentile =
-    Math.max(0, Math.min(100, percentile));
+  let z = 0;
+
+  for (const name of names) {
+
+    const standardized =
+      (x[name] - means[name]) /
+      MODEL.scales[name];
+
+    z += standardized * beta[name];
+  }
+
+
+  /*
+    BAR beta is direction-normalized.
+
+    The training-only calibration maps X beta back
+    onto the centered learned outcome scale.
+  */
+
+  const cal =
+    MODEL.calibration[visitIndex];
+
+  const centeredPrediction =
+    cal.intercept +
+    cal.slope * z;
+
+
+  /*
+    Add back the visit-specific outcome mean.
+
+    This yields the learned phenotype on the
+    uncentered alpha scale.
+  */
+
+  const rawAlphaPrediction =
+    centeredPrediction +
+    cal.outcome_offset;
+
+
+  /*
+    Convert to the L2-normalized alpha scale used
+    for the clinical severity score.
+  */
+
+  const severity =
+    rawAlphaPrediction /
+    MODEL.alpha_norm;
+
+
+  return severity;
+}
+
+
+/* ============================================================
+   Convert severity value to HALO reference percentile
+   ============================================================ */
+
+function percentileFromReference(value, visitIndex) {
+
+  const ref =
+    MODEL.reference[visitIndex];
+
+  const q =
+    ref.quantiles;
+
+  const p =
+    ref.probabilities;
+
+
+  if (value <= q[0]) {
+    return 0;
+  }
+
+  if (value >= q[q.length - 1]) {
+    return 100;
+  }
+
+
+  for (let i = 1; i < q.length; i++) {
+
+    if (value <= q[i]) {
+
+      const q0 = q[i - 1];
+      const q1 = q[i];
+
+      const p0 = p[i - 1];
+      const p1 = p[i];
+
+
+      /*
+        Handle tied quantiles.
+      */
+
+      if (q1 === q0) {
+        return 100 * p1;
+      }
+
+
+      const fraction =
+        (value - q0) /
+        (q1 - q0);
+
+
+      return 100 * (
+        p0 +
+        fraction * (p1 - p0)
+      );
+    }
+  }
+
+
+  return 100;
+}
+
+
+/* ============================================================
+   Formatting
+   ============================================================ */
+
+function ordinal(n) {
 
   const rounded =
-    Math.round(percentile);
+    Math.round(n);
 
-  const numberElement =
-    document.getElementById("percentile-value");
+  const mod100 =
+    rounded % 100;
 
-  const resultCard =
-    document.getElementById("result-card");
-
-  const fill =
-    document.getElementById("percentile-fill");
-
-  const marker =
-    document.getElementById("percentile-marker");
-
-  const interpretation =
-    document.getElementById("interpretation");
+  let suffix = "th";
 
 
-  numberElement.textContent = rounded;
+  if (!(mod100 >= 11 && mod100 <= 13)) {
+
+    if (rounded % 10 === 1) {
+      suffix = "st";
+    }
+
+    else if (rounded % 10 === 2) {
+      suffix = "nd";
+    }
+
+    else if (rounded % 10 === 3) {
+      suffix = "rd";
+    }
+  }
+
+
+  return `${rounded}${suffix}`;
+}
+
+
+/* ============================================================
+   Display results
+   ============================================================ */
+
+function showResults(results) {
+
+  const card =
+    document.getElementById("result");
 
 
   /*
-    Set correct ordinal suffix.
+    Current HTML has one interpretation box.
+    Put both prospective predictions in it.
   */
 
-  const suffix =
-    ordinalSuffix(rounded);
+  document.getElementById(
+    "percentile-value"
+  ).textContent =
+    ordinal(results[0].percentile);
 
-  const sup =
-    document.querySelector(".result-number sup");
 
-  sup.textContent = suffix;
+  document.getElementById(
+    "interpretation"
+  ).innerHTML = `
+
+    <strong>Visit 2 prediction:</strong>
+    ${ordinal(results[0].percentile)} percentile
+    <br><br>
+
+    <strong>Visit 3 prediction:</strong>
+    ${ordinal(results[1].percentile)} percentile
+    <br><br>
+
+    Percentiles are relative to participants in the
+    HALO-MASLD reference cohort at the corresponding
+    follow-up visit.
+
+  `;
 
 
   /*
-    Percentile bar.
+    Hide the static "percentile" label if desired later.
+    For now it remains underneath the primary Visit 2 result.
   */
 
-  fill.style.width =
-    `${percentile}%`;
+  card.classList.remove("hidden");
 
-  marker.style.left =
-    `${percentile}%`;
-
-
-  interpretation.textContent =
-    `The predicted hepatic disease severity is higher than approximately ` +
-    `${rounded}% of participants in the HALO-MASLD reference cohort.`;
-
-
-  resultCard.classList.remove("hidden");
-
-  resultCard.scrollIntoView({
+  card.scrollIntoView({
     behavior: "smooth",
     block: "nearest"
   });
 }
 
 
-/* ---------- Prediction ---------- */
-
+/* ============================================================
+   Main calculation
+   ============================================================ */
 
 function calculateLIFT() {
 
   clearError();
 
-  const values =
-    readInputs();
 
-
-  /*
-    Basic validity checks.
-  */
-
-  if (
-    values.astULN !== null &&
-    values.astULN <= 0
-  ) {
+  if (MODEL === null) {
 
     showError(
-      "AST upper limit of normal must be greater than zero."
+      "The model is still loading. Please try again."
     );
 
     return;
   }
 
 
-  /*
-    Do not generate a fake prediction until the exact
-    validated model constants have been exported from R.
-  */
+  try {
 
-  if (!MODEL.ready) {
+    const x =
+      makePredictors();
 
-    showError(
-      "The calculator interface is working, but the validated " +
-      "LIFT-MASLD model constants have not yet been loaded."
-    );
+
+    const results =
+      MODEL.visits.map(
+        (visit, index) => {
+
+          const severity =
+            predictVisit(x, index);
+
+          const percentile =
+            percentileFromReference(
+              severity,
+              index
+            );
+
+
+          return {
+            visit,
+            severity,
+            percentile
+          };
+        }
+      );
+
 
     console.log(
-      "Clinical inputs:",
-      values
+      "LIFT-MASLD prediction:",
+      results
     );
 
-    return;
+
+    showResults(results);
+
   }
 
+  catch (error) {
 
-  /*
-    FINAL IMPLEMENTATION WILL GO HERE:
+    console.error(error);
 
-      1. Replace missing values with fixed training medians.
-
-      2. Apply:
-           log1p(LSM)
-           log1p(total bilirubin)
-
-      3. Apply the exact training-derived centering/scaling.
-
-      4. Add:
-           platelet_missing
-           APRI_missing
-
-      5. Calculate X beta.
-
-      6. Apply the training-derived calibration.
-
-      7. Convert the predicted hepatic phenotype
-         to its HALO reference percentile.
-
-  */
-
-
-  // Example only after MODEL is populated:
-  //
-  // const percentile =
-  //   predictPercentile(values);
-  //
-  // displayPercentile(percentile);
+    showError(error.message);
+  }
 }
 
 
-/* ---------- Event ---------- */
-
+/* ============================================================
+   Event listener
+   ============================================================ */
 
 document
   .getElementById("calculate")
