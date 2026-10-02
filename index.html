@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>LIFT-MASLD</title>
+
   <meta
     name="description"
     content="LIFT-MASLD clinical prediction model for longitudinal hepatic disease severity in MASLD."
@@ -13,16 +15,19 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
+
 <body>
 
   <main class="container">
 
     <header class="site-header">
+
       <h1>LIFT-MASLD</h1>
 
       <p class="subtitle">
         Longitudinal prediction of hepatic disease severity in MASLD
       </p>
+
     </header>
 
 
@@ -31,8 +36,7 @@
       <h2>Clinical inputs</h2>
 
       <p class="intro">
-        Enter baseline clinical measurements. Leave a field blank if the value
-        is unavailable.
+        Enter baseline clinical measurements. Leave a field blank if the value is unavailable.
       </p>
 
 
@@ -40,11 +44,13 @@
       <div class="input-row">
 
         <div class="field-label">
-          <label for="lsm">Liver stiffness</label>
-          <span class="field-note">FibroScan liver stiffness measurement</span>
+          <label for="lsm">
+            Liver stiffness
+          </label>
         </div>
 
         <div class="input-control">
+
           <input
             id="lsm"
             type="number"
@@ -53,20 +59,27 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-          <span class="unit">kPa</span>
+
+          <span class="unit">
+            kPa
+          </span>
+
         </div>
 
       </div>
 
 
-      <!-- Bilirubin -->
+      <!-- Total bilirubin -->
       <div class="input-row">
 
         <div class="field-label">
-          <label for="bilirubin">Total bilirubin</label>
+          <label for="bilirubin">
+            Total bilirubin
+          </label>
         </div>
 
         <div class="input-control">
+
           <input
             id="bilirubin"
             type="number"
@@ -75,20 +88,27 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-          <span class="unit">mg/dL</span>
+
+          <span class="unit">
+            mg/dL
+          </span>
+
         </div>
 
       </div>
 
 
-      <!-- ALP -->
+      <!-- Alkaline phosphatase -->
       <div class="input-row">
 
         <div class="field-label">
-          <label for="alp">Alkaline phosphatase</label>
+          <label for="alp">
+            Alkaline phosphatase
+          </label>
         </div>
 
         <div class="input-control">
+
           <input
             id="alp"
             type="number"
@@ -97,20 +117,27 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-          <span class="unit">U/L</span>
+
+          <span class="unit">
+            U/L
+          </span>
+
         </div>
 
       </div>
 
 
-      <!-- Platelets -->
+      <!-- Platelet count -->
       <div class="input-row">
 
         <div class="field-label">
-          <label for="platelets">Platelet count</label>
+          <label for="platelets">
+            Platelet count
+          </label>
         </div>
 
         <div class="input-control">
+
           <input
             id="platelets"
             type="number"
@@ -119,41 +146,84 @@
             inputmode="decimal"
             placeholder="Enter value"
           >
-          <span class="unit">10⁹/L</span>
+
+          <span class="unit">
+            10⁹/L
+          </span>
+
         </div>
 
       </div>
 
 
       <!-- AST -->
-     <div class="input-row">
-  <div class="label">
-    AST
-  </div>
-
-  <div class="input-box">
-    <input id="ast" type="number" step="any" placeholder="Enter value">
-    <span class="unit">U/L</span>
-  </div>
-</div>
-
-
-      <!-- AST ULN -->
       <div class="input-row">
-  <div class="label">
-    AST upper limit of normal
-  </div>
 
-  <div class="input-box">
-    <input id="ast-uln" type="number" step="any" value="40">
-    <span class="unit">U/L</span>
-  </div>
-</div>
+        <div class="field-label">
+          <label for="ast">
+            AST
+          </label>
+        </div>
+
+        <div class="input-control">
+
+          <input
+            id="ast"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            placeholder="Enter value"
+          >
+
+          <span class="unit">
+            U/L
+          </span>
+
+        </div>
+
+      </div>
 
 
-      <div id="form-error" class="error-message hidden"></div>
+      <!-- AST upper limit of normal -->
+      <div class="input-row">
 
-      <button id="calculate" type="button">
+        <div class="field-label">
+          <label for="ast-uln">
+            AST upper limit of normal
+          </label>
+        </div>
+
+        <div class="input-control">
+
+          <input
+            id="ast-uln"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            value="40"
+          >
+
+          <span class="unit">
+            U/L
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="form-error"
+        class="error-message hidden"
+      ></div>
+
+
+      <button
+        id="calculate"
+        type="button"
+      >
         Calculate LIFT-MASLD
       </button>
 
@@ -161,24 +231,39 @@
 
 
     <!-- Results -->
-    <section id="result-card" class="card result-card hidden">
+    <section
+      id="result-card"
+      class="card result-card hidden"
+    >
 
       <p class="result-kicker">
         Predicted hepatic disease severity
       </p>
 
       <div class="result-number">
-        <span id="percentile-value">--</span><sup>th</sup>
+        <span id="percentile-value">--</span>
+        <sup>th</sup>
       </div>
 
       <div class="result-label">
         percentile
       </div>
 
+
       <div class="percentile-track">
-        <div id="percentile-fill" class="percentile-fill"></div>
-        <div id="percentile-marker" class="percentile-marker"></div>
+
+        <div
+          id="percentile-fill"
+          class="percentile-fill"
+        ></div>
+
+        <div
+          id="percentile-marker"
+          class="percentile-marker"
+        ></div>
+
       </div>
+
 
       <div class="percentile-axis">
         <span>0</span>
@@ -186,23 +271,35 @@
         <span>100</span>
       </div>
 
-      <p id="interpretation" class="interpretation"></p>
+
+      <p
+        id="interpretation"
+        class="interpretation"
+      ></p>
 
     </section>
 
 
     <!-- Privacy -->
     <section class="privacy-box">
-      <strong>Privacy</strong>
+
+      <strong>
+        Privacy
+      </strong>
+
       <p>
-        All calculations are performed locally in your browser. Values entered
-        into this calculator are not transmitted, stored, or retained.
+        All calculations are performed locally in your browser.
+        Values entered into this calculator are not transmitted,
+        stored, or retained.
       </p>
+
     </section>
 
   </main>
 
+
   <script src="script.js"></script>
 
 </body>
+
 </html>
