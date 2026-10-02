@@ -1,0 +1,163 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f8fa;
+  color: #1f2937;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 50px 24px 80px;
+}
+
+header {
+  margin-bottom: 35px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin-top: 8px;
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 30px;
+  align-items: center;
+
+  min-height: 76px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.label {
+  font-size: 16px;
+}
+
+.subtext {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.input-box {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  overflow: hidden;
+  background: white;
+}
+
+.input-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 13px;
+  font-size: 16px;
+  outline: none;
+}
+
+.unit {
+  padding: 13px 15px;
+  border-left: 1px solid #d1d5db;
+  background: #fafafa;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.toggle {
+  display: flex;
+  gap: 25px;
+}
+
+button {
+  margin-top: 24px;
+  width: 100%;
+  padding: 15px;
+
+  border: 0;
+  border-radius: 9px;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  background: #1f4e79;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.92;
+}
+
+.result {
+  text-align: center;
+}
+
+.percentile {
+  font-size: 54px;
+  font-weight: 700;
+}
+
+.percentile-label {
+  display: block;
+  font-size: 18px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.hidden {
+  display: none;
+}
+
+.notice {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+footer {
+  margin-top: 35px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+@media (max-width: 650px) {
+
+  .input-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 18px 0;
+  }
+
+  .container {
+    padding: 30px 15px 60px;
+  }
+}
