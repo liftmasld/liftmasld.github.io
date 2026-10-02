@@ -342,44 +342,13 @@ function ordinal(n) {
 
 function showResults(results) {
 
-  const card =
-    document.getElementById("result");
+  const card = document.getElementById("result");
 
+  document.getElementById("visit2-result").textContent =
+    `${ordinal(results[0].percentile)} percentile`;
 
-  /*
-    Current HTML has one interpretation box.
-    Put both prospective predictions in it.
-  */
-
-  document.getElementById(
-    "percentile-value"
-  ).textContent =
-    ordinal(results[0].percentile);
-
-
-  document.getElementById(
-    "interpretation"
-  ).innerHTML = `
-
-    <strong>Visit 2 prediction:</strong>
-    ${ordinal(results[0].percentile)} percentile
-    <br><br>
-
-    <strong>Visit 3 prediction:</strong>
-    ${ordinal(results[1].percentile)} percentile
-    <br><br>
-
-    Percentiles are relative to participants in the
-    HALO-MASLD reference cohort at the corresponding
-    follow-up visit.
-
-  `;
-
-
-  /*
-    Hide the static "percentile" label if desired later.
-    For now it remains underneath the primary Visit 2 result.
-  */
+  document.getElementById("visit3-result").textContent =
+    `${ordinal(results[1].percentile)} percentile`;
 
   card.classList.remove("hidden");
 
@@ -388,7 +357,6 @@ function showResults(results) {
     block: "nearest"
   });
 }
-
 
 /* ============================================================
    Main calculation
