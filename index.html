@@ -1,11 +1,130 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>LIFT-MASLD</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <h1>LIFT-MASLD</h1>
-  <p>Longitudinal clinical prediction of hepatic disease severity in MASLD.</p>
+
+  <main class="container">
+
+    <header>
+      <h1>LIFT-MASLD</h1>
+      <p class="subtitle">
+        Longitudinal prediction of hepatic disease severity in MASLD
+      </p>
+    </header>
+
+    <section class="card">
+
+      <h2>Clinical inputs</h2>
+
+      <div class="input-row">
+        <div class="label">
+          Liver stiffness
+          <span class="subtext">FibroScan</span>
+        </div>
+
+        <div class="input-box">
+          <input id="lsm" type="number" step="any">
+          <span class="unit">kPa</span>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="label">
+          Total bilirubin
+        </div>
+
+        <div class="input-box">
+          <input id="bilirubin" type="number" step="any">
+          <span class="unit">mg/dL</span>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="label">
+          Alkaline phosphatase
+        </div>
+
+        <div class="input-box">
+          <input id="alp" type="number" step="any">
+          <span class="unit">U/L</span>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="label">
+          Platelet count
+        </div>
+
+        <div class="input-box">
+          <input id="platelets" type="number" step="any">
+          <span class="unit">10⁹/L</span>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="label">
+          APRI available?
+          <span class="subtext">
+            Used only to reproduce the model's missingness indicator
+          </span>
+        </div>
+
+        <div class="toggle">
+          <label>
+            <input type="radio" name="apri" value="yes" checked>
+            Yes
+          </label>
+
+          <label>
+            <input type="radio" name="apri" value="no">
+            No
+          </label>
+        </div>
+      </div>
+
+      <button id="calculate">
+        Calculate LIFT-MASLD
+      </button>
+
+    </section>
+
+    <section id="result" class="card result hidden">
+
+      <h2>Predicted hepatic disease severity</h2>
+
+      <div class="percentile">
+        <span id="percentile">--</span>
+        <span class="percentile-label">percentile</span>
+      </div>
+
+      <p id="interpretation"></p>
+
+    </section>
+
+    <section class="notice">
+      <strong>Privacy:</strong>
+      All calculations are performed locally in your browser.
+      Values entered into this calculator are not transmitted or stored.
+    </section>
+
+    <footer>
+      <p>
+        LIFT-MASLD is intended for research and clinical decision support
+        and has not yet undergone external validation.
+      </p>
+    </footer>
+
+  </main>
+
+  <script src="script.js"></script>
+
 </body>
 </html>
