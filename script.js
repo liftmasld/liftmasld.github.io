@@ -65,14 +65,6 @@ function makePredictors() {
   const alp = getNumber("alp");
   const platelets = getNumber("platelets");
   const ast = getNumber("ast");
-  const astULN = getNumber("ast-uln");
-
-
-  if (astULN !== null && astULN <= 0) {
-    throw new Error(
-      "AST upper limit of normal must be greater than zero."
-    );
-  }
 
 
   /*
@@ -148,12 +140,10 @@ function makePredictors() {
     only its missingness indicator survived BAR selection.
   */
 
-  const apriAvailable =
-    ast !== null &&
-    astULN !== null &&
-    astULN > 0 &&
-    platelets !== null &&
-    platelets > 0;
+   const apriAvailable =
+     ast !== null &&
+     platelets !== null &&
+     platelets > 0;
 
 
   x[APRI_MISS] =
